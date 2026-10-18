@@ -33,6 +33,8 @@ Não há lint/formatter configurado.
 
 ## Git
 
+Mensagens de commit, títulos de PR e nomes de branch seguem o [Conventional Commits](https://www.conventionalcommits.org/) e são escritos em inglês (ex.: commit/título `feat: add student endpoint`, branch `feat/add-student-endpoint`). Descrições de PR podem ser em português.
+
 Não incluir nenhuma co-autoria ou atribuição: sem `Co-Authored-By` em commits, sem "Generated with Claude Code" ou equivalente em PRs, issues, comentários ou qualquer outro artefato.
 
 ## Contexto do workspace
