@@ -63,6 +63,7 @@ Siga nesta ordem, com TDD: escreva o teste, veja falhar, implemente. Os nomes ab
      - `restore(...)`: reconstrói a partir da persistência, sem gerar nada.
    - Value objects são `record`s que validam no construtor compacto e lançam uma subclasse de `DomainException`.
    - O tempo vem de um `java.time.Clock` recebido como parâmetro, nunca de `Instant.now()`.
+   - Em `create`, trunque instantes para microssegundos (`clock.instant().truncatedTo(ChronoUnit.MICROS)`). O Postgres guarda microssegundos e o relógio do sistema pode ter nanos; sem o truncamento, o valor devolvido na criação difere do lido depois. Cubra isso com um teste de domínio que usa `Clock.fixed` com nanos.
 2. **Portas** (`student/application/port`):
    - `in/`: uma interface por caso de uso (`CreateStudentUseCase`) com um único método, mais os `record`s `XxxCommand` e `XxxResult` com **tipos simples** (`String`, `UUID`, `Instant`...), nunca tipos do domínio. Exceções que fazem parte do contrato (ex.: `StudentNotFoundException extends NotFoundException`) também ficam aqui.
    - `out/`: a porta de saída do agregado (`StudentRepository`), com o que os casos de uso precisam.
@@ -84,12 +85,17 @@ Trechos da referência (`greeting`):
 public record PersonName(String value) {
     public static final int MAX_LENGTH = 100;
     public PersonName {
-        if (value == null || value.isBlank()) {
+        value = value == null ? "" : stripInvisible(value); // remove espaços, inclusive U+00A0 e U+200B, das pontas
+        if (value.isEmpty()) {
             throw new InvalidPersonNameException("O nome é obrigatório");
         }
-        value = value.strip();
         // ...
     }
+}
+
+// domain: fábrica de criação, com o tempo vindo do Clock e truncado para a precisão do Postgres
+public static Greeting create(PersonName name, Clock clock) {
+    return new Greeting(GreetingId.generate(), name, clock.instant().truncatedTo(ChronoUnit.MICROS));
 }
 
 // application: um caso de uso por classe, sem estereótipo do Spring
@@ -144,7 +150,7 @@ Outras convenções:
 | `domain` | unitário puro | JUnit 5 + AssertJ, sem Spring. Use `Clock.fixed(...)` para o tempo. |
 | `application` | unitário puro | Fake em memória da porta de saída (ex.: `InMemoryGreetingRepository` em `src/test`) e `Clock.fixed`. Prefira fakes a Mockito: são mais legíveis e reutilizáveis. |
 | `adapter.in.web` | fatia | `@WebMvcTest(XxxController.class)` + `MockMvcTester`, com `@MockitoBean` nas portas de entrada. Cubra os status de sucesso e os de erro em Problem Details. |
-| `adapter.out.persistence` | fatia | `@DataJpaTest` + `@AutoConfigureTestDatabase(replace = NONE)` + `@Import(XxxPersistenceAdapter.class)`, contra o Postgres do compose. Use `TestEntityManager.flush()`/`clear()` antes de ler, para a leitura vir do banco. |
+| `adapter.out.persistence` | fatia | `@DataJpaTest` + `@AutoConfigureTestDatabase(replace = NONE)` + `@Import(XxxPersistenceAdapter.class)`, contra o Postgres do compose. Use `TestEntityManager.flush()`/`clear()` antes de ler, para a leitura vir do banco. O truncamento para micros é coberto no teste de domínio, porque aqui o agregado chega via `restore`. |
 | arquitetura | ArchUnit | `ArchitectureTest`, que já cobre features novas. |
 | contexto | `@SpringBootTest` | `contextLoads` garante que tudo se liga. |
 
