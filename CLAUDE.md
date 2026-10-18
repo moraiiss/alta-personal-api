@@ -60,6 +60,10 @@ O schema é responsabilidade do Flyway: as migrations ficam em `src/main/resourc
 
 Para testes de repositório, prefira o slice `@DataJpaTest` em vez do `@SpringBootTest` completo.
 
+## Specs, plans e tasks
+
+Specs, plans e tasks ficam sempre direto em `docs/`: `docs/specs/`, `docs/plans/` e `docs/tasks/`, com o nome `YYYY-MM-DD-<tema>.md`. Isso vale também quando uma skill ou ferramenta sugere outro caminho (ex.: `docs/superpowers/...`).
+
 ## Git
 
 Mensagens de commit, títulos de PR e nomes de branch seguem o [Conventional Commits](https://www.conventionalcommits.org/) e são escritos em inglês (ex.: commit/título `feat: add student endpoint`, branch `feat/add-student-endpoint`). Descrições de PR podem ser em português.
