@@ -12,6 +12,7 @@ Projeto recém-gerado (Spring Initializr): só existe a classe `AltaPersonalApiA
 - Spring Web MVC + Spring Data JPA, driver PostgreSQL (runtime)
 - springdoc-openapi 3.1.0: Swagger UI em `/swagger-ui.html` e spec em `/v3/api-docs` quando a app está rodando
 - Testes: JUnit 5 (Jupiter) com os starters `data-jpa-test` e `webmvc-test`
+- Dependências e plugins centralizados no Version Catalog `gradle/libs.versions.toml` (referenciados como `libs.*` no `build.gradle`). Bibliotecas gerenciadas pelo BOM do Spring Boot ficam sem versão no catálogo; só declare versão para o que o BOM não cobre.
 - Pacote base: `br.com.altapersonal.api`. Novos componentes precisam ficar abaixo dele para o component scan do `@SpringBootApplication`.
 
 ## Comandos
