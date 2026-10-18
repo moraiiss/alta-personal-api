@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado do projeto
 
-Projeto no início: só existe a classe `AltaPersonalApiApplication` e o teste `contextLoads`. Ainda não há domínio, controllers, entidades nem migrations. O ambiente local (Docker Compose + Makefile) e o Flyway já estão configurados. Atualize este arquivo quando a arquitetura tomar forma.
+A estrutura base (arquitetura hexagonal por feature) está pronta. A única feature é `greeting`, um domínio falso que serve de implementação de referência. Ainda não há features reais do produto. O ambiente local (Docker Compose + Makefile) e o Flyway estão configurados.
+
+## Arquitetura
+
+Leia `docs/ARCHITECTURE.md` antes de implementar qualquer feature. Ele tem as camadas, as regras de dependência, o passo a passo de uma feature nova e os testes de cada camada. As regras são verificadas pelo `ArchitectureTest` (ArchUnit) e quebram o build se forem violadas.
 
 ## Stack
 
@@ -12,7 +16,7 @@ Projeto no início: só existe a classe `AltaPersonalApiApplication` e o teste `
 - Spring Web MVC + Spring Data JPA, driver PostgreSQL (runtime)
 - Flyway para o schema; Spring Boot DevTools (`developmentOnly`) para hot reload
 - springdoc-openapi 3.1.0: Swagger UI em `/swagger-ui.html` e spec em `/v3/api-docs` quando a app está rodando
-- Testes: JUnit 5 (Jupiter) com os starters `data-jpa-test` e `webmvc-test`
+- Testes: JUnit 5 (Jupiter) com os starters `data-jpa-test` e `webmvc-test`; ArchUnit para as regras de arquitetura
 - Dependências e plugins centralizados no Version Catalog `gradle/libs.versions.toml` (referenciados como `libs.*` no `build.gradle`). Bibliotecas gerenciadas pelo BOM do Spring Boot ficam sem versão no catálogo; só declare versão para o que o BOM não cobre.
 - Pacote base: `br.com.altapersonal.api`. Novos componentes precisam ficar abaixo dele para o component scan do `@SpringBootApplication`.
 
@@ -59,6 +63,10 @@ O banco é próprio da API e independente do Supabase do frontend. O datasource 
 O schema é responsabilidade do Flyway: as migrations ficam em `src/main/resources/db/migration` e rodam na subida da app, inclusive a cada restart do DevTools. O Hibernate usa `ddl-auto: validate`, então toda mudança de entidade precisa de uma migration. Não altere nem renomeie uma migration já aplicada. Se você apagar uma migration aplicada localmente, o Flyway falha na validação: rode `make db-reset`.
 
 Para testes de repositório, prefira o slice `@DataJpaTest` em vez do `@SpringBootTest` completo.
+
+## Specs, plans e tasks
+
+Specs, plans e tasks ficam sempre direto em `docs/`: `docs/specs/`, `docs/plans/` e `docs/tasks/`, com o nome `YYYY-MM-DD-<tema>.md`. Isso vale também quando uma skill ou ferramenta sugere outro caminho (ex.: `docs/superpowers/...`).
 
 ## Git
 
