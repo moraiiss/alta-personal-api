@@ -1,3 +1,7 @@
 spring:
   application:
     name: alta-personal-api
+  jpa:
+    hibernate:
+      # O schema é do Flyway (db/migration); o Hibernate só confere se as entidades batem
+      ddl-auto: validate
