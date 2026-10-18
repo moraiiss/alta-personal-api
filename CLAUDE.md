@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado do projeto
 
-Projeto no início: só existe a classe `AltaPersonalApiApplication` e o teste `contextLoads`. Ainda não há domínio, controllers, entidades nem migrations. O ambiente local (Docker Compose + Makefile) e o Flyway já estão configurados. Atualize este arquivo quando a arquitetura tomar forma.
+A estrutura base (arquitetura hexagonal por feature) está pronta. A única feature é `greeting`, um domínio falso que serve de implementação de referência. Ainda não há features reais do produto. O ambiente local (Docker Compose + Makefile) e o Flyway estão configurados.
+
+## Arquitetura
+
+Leia `docs/ARCHITECTURE.md` antes de implementar qualquer feature. Ele tem as camadas, as regras de dependência, o passo a passo de uma feature nova e os testes de cada camada. As regras são verificadas pelo `ArchitectureTest` (ArchUnit) e quebram o build se forem violadas.
 
 ## Stack
 
@@ -12,7 +16,7 @@ Projeto no início: só existe a classe `AltaPersonalApiApplication` e o teste `
 - Spring Web MVC + Spring Data JPA, driver PostgreSQL (runtime)
 - Flyway para o schema; Spring Boot DevTools (`developmentOnly`) para hot reload
 - springdoc-openapi 3.1.0: Swagger UI em `/swagger-ui.html` e spec em `/v3/api-docs` quando a app está rodando
-- Testes: JUnit 5 (Jupiter) com os starters `data-jpa-test` e `webmvc-test`
+- Testes: JUnit 5 (Jupiter) com os starters `data-jpa-test` e `webmvc-test`; ArchUnit para as regras de arquitetura
 - Dependências e plugins centralizados no Version Catalog `gradle/libs.versions.toml` (referenciados como `libs.*` no `build.gradle`). Bibliotecas gerenciadas pelo BOM do Spring Boot ficam sem versão no catálogo; só declare versão para o que o BOM não cobre.
 - Pacote base: `br.com.altapersonal.api`. Novos componentes precisam ficar abaixo dele para o component scan do `@SpringBootApplication`.
 
