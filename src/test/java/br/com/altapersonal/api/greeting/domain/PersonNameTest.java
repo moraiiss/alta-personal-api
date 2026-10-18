@@ -15,9 +15,15 @@ class PersonNameTest {
         assertThat(new PersonName("  Maria  ").value()).isEqualTo("Maria");
     }
 
+    @Test
+    void stripsInvisibleCharactersAtTheEdges() {
+        assertThat(new PersonName("\u00A0Maria\u200B\u202F").value()).isEqualTo("Maria");
+    }
+
     @ParameterizedTest
     @NullSource
-    @ValueSource(strings = {"", "   "})
+    // Inclui espaço sem quebra (U+00A0, U+202F) e espaço de largura zero (U+200B), comuns em texto colado
+    @ValueSource(strings = {"", "   ", "\u00A0", "\u200B", "\u202F \u00A0"})
     void rejectsMissingName(String value) {
         assertThatThrownBy(() -> new PersonName(value))
                 .isInstanceOf(InvalidPersonNameException.class)
